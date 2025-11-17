@@ -54,7 +54,9 @@ public class ClientController {
 
     @DeleteMapping(CLIENT_PATH_ID)
     public ResponseEntity deleteById(@PathVariable("clientId") UUID clientId) {
-        clientService.deleteById(clientId);
+        if (!clientService.deleteById(clientId)){
+            throw new NotFoundException();
+        }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

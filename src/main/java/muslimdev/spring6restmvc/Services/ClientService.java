@@ -16,7 +16,7 @@ public interface ClientService {
 
     Optional<ClientDTO> updateClientId(UUID clientId, ClientDTO client);
 
-    void deleteById(UUID clientId);
+    Boolean deleteById(UUID clientId);
 
     void patchById(UUID clienId, ClientDTO client);
 }

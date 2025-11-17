@@ -86,8 +86,9 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void deleteById(UUID clientId) {
+    public Boolean deleteById(UUID clientId) {
         clientMap.remove(clientId);
+        return true;
     }
 
     @Override

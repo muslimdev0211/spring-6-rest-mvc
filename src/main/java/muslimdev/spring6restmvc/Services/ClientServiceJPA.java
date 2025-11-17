@@ -55,8 +55,13 @@ public class ClientServiceJPA implements ClientService {
     }
 
     @Override
-    public void deleteById(UUID clientId) {
+    public Boolean deleteById(UUID clientId) {
+        if (clientRepository.existsById(clientId)){
+            clientRepository.deleteById(clientId);
+            return true;
+        }
 
+        return false;
     }
 
     @Override

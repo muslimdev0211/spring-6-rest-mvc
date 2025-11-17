@@ -30,6 +30,30 @@ class ClientControllerIT {
 
 
     @Test
+    void testDeleteNotFound() {
+        assertThrows(NotFoundException.class, () ->{
+            clientController.deleteById(UUID.randomUUID());
+
+        });
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void testDeleteByIdFound() {
+        Client client = clientRepository.findAll().get(0);
+
+        ResponseEntity responseEntity = clientController.deleteById(client.getId());
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+
+        assertThat(clientRepository.findById(client.getId())).isEmpty();
+    }
+
+
+
+
+    @Test
     void testUpdateNotFound() {
         assertThrows(NotFoundException.class, () -> {
             clientController.updateById(UUID.randomUUID(), ClientDTO.builder().build());

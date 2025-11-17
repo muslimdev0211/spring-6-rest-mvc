@@ -126,7 +126,7 @@ class ClientControllerTest {
     @Test
     void TestDeleteClient() throws Exception {
         ClientDTO client = clientServiceImpl.getClientList().get(0);
-
+        given(clientService.deleteById(any())).willReturn(true);
         mockMvc.perform(delete(ClientController.CLIENT_PATH + "/" + client.getId())
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
 
