@@ -123,6 +123,7 @@ class BeerControllerTest {
 
     @Test
     void TestDeleteBeer() throws Exception {
+        given(beerService.deleteById(any())).willReturn(true);
         BeerDTO beer = beerServiceImpl.listBeers().get(0);
 
         mockMvc.perform(delete(BeerController.BEER_PATH + "/" + beer.getId())

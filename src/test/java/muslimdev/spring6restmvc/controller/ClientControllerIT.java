@@ -23,7 +23,6 @@ class ClientControllerIT {
 
     @Autowired
     ClientRepository clientRepository;
-
     @Test
     void testIdNotFound() {
         assertThrows(NotFoundException.class, () -> {
