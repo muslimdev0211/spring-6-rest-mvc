@@ -25,7 +25,9 @@ public class ClientController {
     @PutMapping(CLIENT_PATH_ID)
     public ResponseEntity updateById(@PathVariable("clientId") UUID clientId, @RequestBody ClientDTO client) {
 
-        clientService.updateClientId(clientId, client);
+       if (clientService.updateClientId(clientId, client).isEmpty()){
+           throw new NotFoundException();
+       };
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

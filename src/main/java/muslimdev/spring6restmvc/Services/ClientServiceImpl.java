@@ -74,13 +74,14 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void updateClientId(UUID clientId, ClientDTO client) {
+    public Optional<ClientDTO> updateClientId(UUID clientId, ClientDTO client) {
         ClientDTO exciting = clientMap.get(clientId);
         exciting.setClientName(client.getClientName());
         exciting.setVersion(client.getVersion());
 
         clientMap.put(clientId, exciting);
 
+        return Optional.of(exciting);
 
     }
 

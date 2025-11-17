@@ -139,7 +139,7 @@ class ClientControllerTest {
     @Test
     void TestUpdateClient() throws Exception {
         ClientDTO client = clientServiceImpl.getClientList().get(0);
-
+        given(clientService.updateClientId(any(), any())).willReturn(Optional.of(client));
         mockMvc.perform(put(ClientController.CLIENT_PATH + "/" + client.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)

@@ -14,7 +14,7 @@ public interface ClientService {
 
     ClientDTO saveNewClient(ClientDTO client);
 
-    void updateClientId(UUID clientId, ClientDTO client);
+    Optional<ClientDTO> updateClientId(UUID clientId, ClientDTO client);
 
     void deleteById(UUID clientId);
 
