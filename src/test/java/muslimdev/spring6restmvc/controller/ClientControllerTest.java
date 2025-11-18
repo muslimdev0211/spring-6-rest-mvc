@@ -82,6 +82,7 @@ class ClientControllerTest {
 
 
 
+
     @Test
     void getById() throws Exception {
         ClientDTO testClient = clientServiceImpl.getClientList().get(0);

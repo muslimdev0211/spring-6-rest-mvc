@@ -7,6 +7,7 @@ import muslimdev.spring6restmvc.model.BeerDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class BeerController {
     private final BeerService beerService;
 
     @PutMapping(BEER_PATH_ID)
-    public ResponseEntity updateBeer(@PathVariable("beerId") UUID beerId, @RequestBody BeerDTO beer){
+    public ResponseEntity updateBeer(@PathVariable("beerId") UUID beerId,  @RequestBody BeerDTO beer){
 
         if (beerService.updateById(beerId, beer).isEmpty()){
          throw new NotFoundException();
@@ -51,7 +52,7 @@ public class BeerController {
 
 
     @PostMapping(BEER_PATH)
-    public ResponseEntity handlePost(@RequestBody BeerDTO beer){
+    public ResponseEntity handlePost( @Validated @RequestBody BeerDTO beer){
         BeerDTO beer1 = beerService.saveNewBeer(beer);
 
         HttpHeaders headers = new HttpHeaders();
