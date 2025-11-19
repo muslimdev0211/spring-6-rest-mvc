@@ -114,7 +114,8 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public void patchUpdate(UUID beerId, BeerDTO beer) {
+    public Optional<BeerDTO> patchUpdate(UUID beerId, BeerDTO beer) {
+
         BeerDTO exciting = beerMap.get(beerId);
 
         if (StringUtils.hasText(beer.getBeerName())) {
@@ -132,9 +133,9 @@ public class BeerServiceImpl implements BeerService {
             exciting.setUpc(beer.getUpc());
         }
 
-        if (beer.getQuantityOnHand() != null){
+        if (beer.getQuantityOnHand() != null) {
             exciting.setQuantityOnHand(beer.getQuantityOnHand());
         }
-
+        return Optional.of(exciting);
     }
 }
