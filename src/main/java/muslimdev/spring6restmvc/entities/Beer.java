@@ -6,7 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import muslimdev.spring6restmvc.model.BeerStyle;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,15 +21,16 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Beer {
 
     @Id
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
-    @Column(length = 36, columnDefinition = "varchar", updatable = false, nullable = false)
+    @JdbcTypeCode(SqlTypes.CHAR)
+    @Column(length = 36, columnDefinition = "varchar(36)", updatable = false, nullable = false)
     private UUID id;
 
     @Version
@@ -37,6 +41,7 @@ public class Beer {
     @Column(length = 50)
     private String beerName;
     @NotNull
+    @JdbcTypeCode(value = SqlTypes.SMALLINT)
     private BeerStyle beerStyle;
     @NotNull
     @NotBlank
