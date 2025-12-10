@@ -82,7 +82,7 @@ class ClientControllerIT {
     @Rollback
     @Transactional
     @Test
-    void saveNewBeer() {
+    void saveNewClient() {
         ClientDTO clientDTO = ClientDTO.builder()
                 .clientName("TEST")
                 .build();

@@ -4,15 +4,20 @@ import muslimdev.spring6restmvc.entities.Client;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@SpringBootTest
 class ClientRepositoryTest {
 
     @Autowired
     ClientRepository clientRepository;
 
+    @Rollback
+    @Transactional
     @Test
     void testSaveClient(){
 
