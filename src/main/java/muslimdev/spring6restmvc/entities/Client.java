@@ -7,6 +7,8 @@ import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -32,4 +34,8 @@ public class Client {
     private String clientName;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "client")
+    private Set<BeerOrder>  beerOrders =  new HashSet<>();
 }
