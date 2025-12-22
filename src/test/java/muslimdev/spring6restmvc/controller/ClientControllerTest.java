@@ -3,6 +3,7 @@ package muslimdev.spring6restmvc.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import muslimdev.spring6restmvc.Services.ClientService;
 import muslimdev.spring6restmvc.Services.ClientServiceImpl;
+import muslimdev.spring6restmvc.config.SpringSecConfig;
 import muslimdev.spring6restmvc.model.ClientDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,10 +26,12 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ClientController.class)
+@Import(SpringSecConfig.class)
 class ClientControllerTest {
 
 
@@ -51,7 +55,8 @@ class ClientControllerTest {
     void getAllClients() throws Exception {
         given(clientService.getClientList()).willReturn(clientServiceImpl.getClientList());
 
-        mockMvc.perform(get(ClientController.CLIENT_PATH).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(ClientController.CLIENT_PATH).accept(MediaType.APPLICATION_JSON)
+                        .with(BeerControllerTest.jwtRequestPostProcessor))
                 .andExpect(status().isOk())
                 .andExpect( content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()", is(3)));
@@ -65,12 +70,13 @@ class ClientControllerTest {
         Map<String, Object> clinetMap = new HashMap<>();
 
         clinetMap.put("clientName", "New Name");
-
         mockMvc.perform(patch(ClientController.CLIENT_PATH + "/" + client.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(clinetMap)))
+                        .with(BeerControllerTest.jwtRequestPostProcessor)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(clinetMap)))
                 .andExpect(status().isNoContent());
+
 
         verify(clientService).patchById(uuidArgumentCaptor.capture(), clientArgumentCaptor.capture());
         assertThat(client.getId()).isEqualTo(uuidArgumentCaptor.getValue());
@@ -90,6 +96,7 @@ class ClientControllerTest {
         given(clientService.getClientId(testClient.getId())).willReturn(Optional.of(testClient));
 
         mockMvc.perform(get( ClientController.CLIENT_PATH + "/" + testClient.getId())
+                        .with(BeerControllerTest.jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -112,6 +119,7 @@ class ClientControllerTest {
         given(clientService.saveNewClient(any(ClientDTO.class))).willReturn(clientServiceImpl.getClientList().get(1));
 
         mockMvc.perform(post(ClientController.CLIENT_PATH)
+                        .with(BeerControllerTest.jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(client)))
@@ -129,6 +137,7 @@ class ClientControllerTest {
         ClientDTO client = clientServiceImpl.getClientList().get(0);
         given(clientService.deleteById(any())).willReturn(true);
         mockMvc.perform(delete(ClientController.CLIENT_PATH + "/" + client.getId())
+                .with(BeerControllerTest.jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
 
         ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
@@ -142,6 +151,7 @@ class ClientControllerTest {
         ClientDTO client = clientServiceImpl.getClientList().get(0);
         given(clientService.updateClientId(any(), any())).willReturn(Optional.of(client));
         mockMvc.perform(put(ClientController.CLIENT_PATH + "/" + client.getId())
+                        .with(BeerControllerTest.jwtRequestPostProcessor)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(client)))
@@ -154,7 +164,9 @@ class ClientControllerTest {
     void getByIdNotFound() throws Exception {
 
         given(clientService.getClientId(any(UUID.class))).willReturn(Optional.empty());
-        mockMvc.perform(get(ClientController.CLIENT_PATH_ID, UUID.randomUUID())).andExpect(status().isNotFound());
+        mockMvc.perform(get(ClientController.CLIENT_PATH_ID, UUID.randomUUID())
+                .with(BeerControllerTest.jwtRequestPostProcessor))
+                .andExpect(status().isNotFound());
     }
 
 

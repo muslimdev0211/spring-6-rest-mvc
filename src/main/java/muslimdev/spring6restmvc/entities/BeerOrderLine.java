@@ -31,7 +31,7 @@ public class BeerOrderLine {
     @Column(updatable = false)
     private Timestamp createdDate;
     @UpdateTimestamp
-    private Timestamp updatedDate;
+    private Timestamp lastModifiedDate;
 
     public boolean isNew() {
         return this.id == null;
