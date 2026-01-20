@@ -1,0 +1,20 @@
+package muslimdev.spring6restmvc.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.zalando.logbook.HttpLogFormatter;
+import org.zalando.logbook.Sink;
+import org.zalando.logbook.json.JsonHttpLogFormatter;
+import org.zalando.logbook.logstash.LogstashLogbackSink;
+
+@Configuration
+public class LogBookConfig {
+
+    @Bean
+    public Sink LogBookLogStash(){
+
+        HttpLogFormatter formatter = new JsonHttpLogFormatter();
+        LogstashLogbackSink sink = new LogstashLogbackSink(formatter);
+        return sink;
+    }
+}

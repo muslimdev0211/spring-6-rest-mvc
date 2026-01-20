@@ -2,44 +2,52 @@ package muslimdev.spring6restmvc.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.val;
 import muslimdev.spring6restmvc.entities.Beer;
+import muslimdev.spring6restmvc.events.BeerCreatedEvent;
+import muslimdev.spring6restmvc.events.BeerUpdatedEvent;
 import muslimdev.spring6restmvc.mappers.BeerMapper;
 import muslimdev.spring6restmvc.model.BeerDTO;
 import muslimdev.spring6restmvc.model.BeerStyle;
 import muslimdev.spring6restmvc.repositories.BeerRepository;
 import org.hamcrest.core.IsNull;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@RecordApplicationEvents
 @SpringBootTest
 class BeerControllerIT {
+
+    @Autowired
+    ApplicationEvents applicationEvents;
     @Autowired
     BeerController beerController;
     @Autowired
@@ -176,6 +184,61 @@ class BeerControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()", is(336)));
 
+    }
+
+    @Test
+    void testPatchedBeer() throws Exception{
+        Beer beer = beerRepository.findAll().get(0);
+
+        Map<String, Object> beerMap = new HashMap<>();
+        beerMap.put("beerName", "New Name");
+
+        mockMvc.perform(patch(BeerController.BEER_PATH_ID, beer.getId())
+                .with(BeerControllerTest.jwtRequestPostProcessor)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(beerMap)))
+                .andExpect(status().isNoContent()).andReturn();
+    }
+
+    @Test
+    void testUpdateBeer() throws Exception {
+        Beer beer = beerRepository.findAll().get(0);
+
+        BeerDTO beerDTO = beerMapper.beerToBeerDto(beer);
+
+        beerDTO.setBeerName("Update Name");
+
+        mockMvc.perform(put(BeerController.BEER_PATH_ID, beer.getId())
+                .with(BeerControllerTest.jwtRequestPostProcessor)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(beerDTO)))
+                .andExpect(status().isNoContent()).andReturn();
+
+        Assertions.assertEquals(1, applicationEvents
+                .stream(BeerUpdatedEvent.class)
+                .count());
+    }
+
+    @Test
+    void testCreatedBeer() throws Exception {
+        val beerDto = BeerDTO.builder()
+                .beerName("Ghost")
+                .beerStyle(BeerStyle.LAGER)
+                .upc("32323")
+                .price(BigDecimal.TEN)
+                .quantityOnHand(2113)
+                .build();
+
+        mockMvc.perform(post(BeerController.BEER_PATH)
+                .with(BeerControllerTest.jwtRequestPostProcessor)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(beerDto)))
+                .andExpect(status().isCreated()).andReturn();
+
+        Assertions.assertEquals(1, applicationEvents.stream(BeerCreatedEvent.class).count());
     }
 
     @Test

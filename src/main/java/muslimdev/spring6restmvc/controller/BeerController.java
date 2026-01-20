@@ -25,7 +25,6 @@ public class BeerController {
     public static final String BEER_PATH_ID = BEER_PATH + "/{beerId}";
 
 
-
     private final BeerService beerService;
 
     @PutMapping(BEER_PATH_ID)

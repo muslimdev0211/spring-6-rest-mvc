@@ -39,7 +39,6 @@ public class BootstrapData implements CommandLineRunner {
 
     }
 
-
     private void loadCSVdata() throws FileNotFoundException {
         if (beerRepository.count() < 10){
             File file = ResourceUtils.getFile("classpath:csvdata/beer.csv");

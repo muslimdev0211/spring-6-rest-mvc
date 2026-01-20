@@ -11,7 +11,7 @@ CREATE TABLE `beer_order`
     client_id        varchar(36)  DEFAULT NULL,
     PRIMARY KEY (id),
     CONSTRAINT FOREIGN KEY (client_id) REFERENCES client (id)
-) ENGINE = InnoDB;
+) ;
 
 CREATE TABLE `beer_order_line`
 (
