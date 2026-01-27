@@ -9,6 +9,7 @@ import muslimdev.spring6restmvc.events.BeerUpdatedEvent;
 import muslimdev.spring6restmvc.mappers.BeerMapper;
 import muslimdev.spring6restmvc.model.BeerDTO;
 import muslimdev.spring6restmvc.model.BeerStyle;
+import muslimdev.spring6restmvc.repositories.BeerOrderRepository;
 import muslimdev.spring6restmvc.repositories.BeerRepository;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.Assertions;
@@ -64,6 +65,8 @@ class BeerControllerIT {
     WebApplicationContext wac;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    private BeerOrderRepository beerOrderRepository;
 
     @BeforeEach
     void setUp() {
@@ -359,6 +362,8 @@ class BeerControllerIT {
     @Transactional
     @Test
     void testEmptyList() {
+        beerOrderRepository.deleteAll();
+
         beerRepository.deleteAll();
         Page<BeerDTO> dtos = beerController.listBeers(null, null, false, 1, 25);
 

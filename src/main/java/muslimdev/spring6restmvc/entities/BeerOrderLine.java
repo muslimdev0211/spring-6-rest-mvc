@@ -1,9 +1,12 @@
 package muslimdev.spring6restmvc.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
-import org.hibernate.annotations.*;
-import org.hibernate.annotations.processing.SQL;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
 import java.sql.Timestamp;
@@ -43,6 +46,7 @@ public class BeerOrderLine {
     @ManyToOne
     private Beer beer;
 
-    private Integer orderQuantity = 0;
+    @Min(value = 1, message = "Quantity On Hand nust be greater than 0")
+    private Integer orderQuantity = 1;
     private Integer quantityAllocated = 0;
 }

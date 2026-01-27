@@ -3,6 +3,7 @@ package muslimdev.spring6restmvc.controller;
 import muslimdev.spring6restmvc.entities.Client;
 import muslimdev.spring6restmvc.mappers.ClientMapper;
 import muslimdev.spring6restmvc.model.ClientDTO;
+import muslimdev.spring6restmvc.repositories.BeerOrderRepository;
 import muslimdev.spring6restmvc.repositories.ClientRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ class ClientControllerIT {
     ClientRepository clientRepository;
     @Autowired
     ClientMapper clientMapper;
+    @Autowired
+    private BeerOrderRepository beerOrderRepository;
 
 
     @Test
@@ -124,6 +127,8 @@ class ClientControllerIT {
     @Rollback
     @Test
     void testEmptyList() {
+        beerOrderRepository.deleteAll();
+
         clientRepository.deleteAll();
 
         List<ClientDTO> dtos = clientController.getAllClients();

@@ -1,11 +1,15 @@
 package muslimdev.spring6restmvc.bootstrap;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import muslimdev.spring6restmvc.Services.BeerCSVService;
 import muslimdev.spring6restmvc.entities.Beer;
+import muslimdev.spring6restmvc.entities.BeerOrder;
+import muslimdev.spring6restmvc.entities.BeerOrderLine;
 import muslimdev.spring6restmvc.entities.Client;
 import muslimdev.spring6restmvc.model.BeerCSVRecord;
 import muslimdev.spring6restmvc.model.BeerStyle;
+import muslimdev.spring6restmvc.repositories.BeerOrderRepository;
 import muslimdev.spring6restmvc.repositories.BeerRepository;
 import muslimdev.spring6restmvc.repositories.ClientRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +33,7 @@ public class BootstrapData implements CommandLineRunner {
     private final BeerRepository beerRepository;
     private final ClientRepository clientRepository;
     private final BeerCSVService beerCSVService;
+    private final BeerOrderRepository beerOrderRepository;
 
 
     @Transactional
@@ -36,8 +42,43 @@ public class BootstrapData implements CommandLineRunner {
         loadBeerData();
         loadCSVdata();
         loadClientData();
+        loadOrderData();
+    }
+
+    private void loadOrderData() {
+        if (beerOrderRepository.count() == 0){
+            val clients = clientRepository.findAll();
+            val beers = beerRepository.findAll();
+
+            val beerIterator = beers.iterator();
+
+            clients.forEach(client -> {
+                Beer beer1 = beerIterator.next();
+                Beer beer2 = beerIterator.next();
+
+                val beerOrder = BeerOrder.builder()
+                        .client(client)
+                        .beerOrderLines(Set.of(
+                                BeerOrderLine.builder()
+                                        .beer(beer1)
+                                        .orderQuantity(1)
+                                        .build(),
+                                BeerOrderLine.builder()
+                                        .beer(beer2)
+                                        .orderQuantity(2)
+                                        .build()
+                        ))
+                        .build();
+
+                beerOrderRepository.save(beerOrder);
+            });
+
+            val orders = beerOrderRepository.findAll();
+        }
+
 
     }
+
 
     private void loadCSVdata() throws FileNotFoundException {
         if (beerRepository.count() < 10){

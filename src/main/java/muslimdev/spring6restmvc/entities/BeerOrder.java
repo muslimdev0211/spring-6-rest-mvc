@@ -1,5 +1,6 @@
 package muslimdev.spring6restmvc.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -27,7 +28,7 @@ public class BeerOrder {
         LastModifiedDate = lastModifiedDate;
         this.clientRef = clientRef;
         this.setClient(client);
-        this.beerOrderLines = beerOrderLines;
+        this.setBeerOrderLines(beerOrderLines);
         this.setBeerOrderShipment(beerOrderShipment);
     }
 
@@ -60,21 +61,31 @@ public class BeerOrder {
     private Client client;
 
     public void setClient(Client client) {
-        this.client = client;
-        client.getBeerOrders().add(this);
+        if (client != null){
+            this.client = client;
+            client.getBeerOrders().add(this);
+        }
     }
 
     public void setBeerOrderShipment(BeerOrderShipment beerOrderShipment){
-        this.beerOrderShipment = beerOrderShipment;
-        beerOrderShipment.setBeerOrder(this);
+        if (beerOrderShipment != null){
+            this.beerOrderShipment = beerOrderShipment;
+            beerOrderShipment.setBeerOrder(this);
+        }
     }
 
 
 
 
-    @OneToMany(mappedBy = "beerOrder")
+    @OneToMany(mappedBy = "beerOrder", cascade = CascadeType.ALL)
     private Set<BeerOrderLine> beerOrderLines;
 
+    public void setBeerOrderLines(Set<BeerOrderLine> beerOrderLines){
+        if (beerOrderLines != null){
+            this.beerOrderLines = beerOrderLines;
+            beerOrderLines.forEach(beerOrderLine -> beerOrderLine.setBeerOrder(this));
+        }
+    }
     @OneToOne(cascade = CascadeType.PERSIST)
     private BeerOrderShipment beerOrderShipment;
 }
